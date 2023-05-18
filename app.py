@@ -23,6 +23,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{POSTGRES_USER}:
                                         f"{POSTGRES_PASSWORD}@{POSTGRES_HOST}:" \
                                         f"{POSTGRES_PORT}/{POSTGRES_DB}"
 
+
 db = SQLAlchemy(app)
 
 

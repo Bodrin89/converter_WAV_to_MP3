@@ -26,7 +26,4 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 
 fi
 
-ansible-vault decrypt .env --vault-password-file=<(echo "61t0ezBMk5vv")
-
-
 exec "$@"

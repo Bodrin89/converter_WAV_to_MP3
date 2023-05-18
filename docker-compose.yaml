@@ -21,7 +21,7 @@ services:
       - my_network_2
 
   api:
-    image: vladimirbodrin/test_work:test2
+    image: vladimirbodrin/test_work:test_work_2
     env_file:
       - .env
     depends_on:

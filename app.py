@@ -3,60 +3,20 @@ import os
 import uuid
 import secrets
 import subprocess
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, send_file
 from dotenv import load_dotenv, find_dotenv
-from marshmallow import Schema, fields
+
+from config import Config
+from models import db, UserSchema, User, Audio
 
 app = Flask(__name__)
 
 load_dotenv(find_dotenv())
 
-POSTGRES_USER = os.environ.get("POSTGRES_USER")
-POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
-POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
-POSTGRES_DB = os.environ.get("POSTGRES_DB")
-POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
 API_PORT = os.environ.get("API_PORT")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{POSTGRES_USER}:" \
-                                        f"{POSTGRES_PASSWORD}@{POSTGRES_HOST}:" \
-                                        f"{POSTGRES_PORT}/{POSTGRES_DB}"
-
-
-db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    __tablename__ = 'user'
-
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String(255))
-    name = db.Column(db.String(255))
-    token = db.Column(db.String(255))
-
-
-class UserSchema(Schema):
-    id = fields.Int(dump_only=True)
-    uuid = fields.String()
-    name = fields.String()
-    token = fields.String()
-
-
-class Audio(db.Model):
-    __tablename__ = 'audio'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User")
-    name_audio = db.Column(db.String())
-    audio_file = db.Column(db.LargeBinary())
-
-
-class AudioSchema(Schema):
-    id = fields.Int(dump_only=True)
-    user_id = fields.Int()
-
+app.config.from_object(Config)
+db.init_app(app)
 
 with app.app_context():
     db.create_all()

@@ -5,3 +5,5 @@
 !app.py
 !requirements.txt
 !entrypoint.sh
+!config.py
+!models.py

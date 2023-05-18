@@ -49,7 +49,7 @@ def load_audio_file():
         return {'message': 'Не корректные данные'}, 400
 
     if not User.query.filter_by(name=user_name).first():
-        return "Такого пользователя не существует"
+        return "Такого пользователя не существует", 400
 
     name_audio = uuid.uuid4()
     wav_path = f'./audio_file/file_wav/{name_audio}.wav'
@@ -100,7 +100,8 @@ def download():
         os.unlink(file_path)
         return result
     else:
-        return 'Аудио файл не найден', 404
+        return 'Аудио файл не найден', 400
+
 
 if __name__ == '__main__':
     app.run()

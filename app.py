@@ -48,7 +48,7 @@ def load_audio_file():
     if not (user_name and token and audio_wav):
         return {'message': 'Не корректные данные'}, 400
 
-    if not User.query.filter_by(name=user_name).first():
+    if not User.query.filter_by(name=user_name, token=token).first():
         return "Такого пользователя не существует", 400
 
     name_audio = uuid.uuid4()

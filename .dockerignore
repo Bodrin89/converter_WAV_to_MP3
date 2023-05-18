@@ -1,0 +1,7 @@
+# ignore all
+**
+
+#expect
+!app.py
+!requirements.txt
+!entrypoint.sh

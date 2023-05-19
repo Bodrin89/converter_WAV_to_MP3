@@ -140,4 +140,5 @@ dmypy.json
 cython_debug/
 
 text.txt
+d-c.yaml
 

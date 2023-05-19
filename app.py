@@ -1,19 +1,20 @@
 import os
+from concurrent.futures import ProcessPoolExecutor
 
 import uuid
 import secrets
-import subprocess
 from flask import Flask, request, send_file
 from dotenv import load_dotenv, find_dotenv
 
 from config import Config
+from convert_file import convert_file
 from models import db, UserSchema, User, Audio
 
 app = Flask(__name__)
 
 load_dotenv(find_dotenv())
 
-API_PORT = os.environ.get("API_PORT")
+
 
 app.config.from_object(Config)
 db.init_app(app)
@@ -58,28 +59,13 @@ def load_audio_file():
     # Путь для сохранения файла MP3
     mp3_path = f'./audio_file/file_mp3/{name_audio}.mp3'
 
-    # Вызов команды lame для конвертации
-    command = f'lame --preset insane "{wav_path}" "{mp3_path}"'
-    subprocess.run(command, shell=True)
+    # Создаем пул процессов
+    executor = ProcessPoolExecutor(max_workers=1)
 
-    # Чтение mp3 файла в бинарном виде для сохранения в БД
-    with open(mp3_path, 'rb') as audio_file:
-        audio_data = audio_file.read()
-    user = User.query.filter_by(name=user_name).first()
-
-    audio = Audio(
-        user=user,
-        name_audio=name_audio,
-        audio_file=audio_data
-    )
-    db.session.add(audio)
-    db.session.commit()
-
-    os.unlink(mp3_path)
-    os.unlink(wav_path)
-
-    # Ссылка для скачивания mp3 файла
-    return f'http://127.0.0.1:{API_PORT}/record?id={audio.id}&user={user.id}'
+    # Запускаем конвертацию файла в отдельном процессе
+    future = executor.submit(convert_file, user_name, token, mp3_path, wav_path, name_audio)
+    download_url = future.result()
+    return download_url
 
 
 @app.route('/record/')

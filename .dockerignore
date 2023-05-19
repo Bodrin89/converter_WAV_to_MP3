@@ -7,3 +7,4 @@
 !entrypoint.sh
 !config.py
 !models.py
+!convert_file.py

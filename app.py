@@ -52,6 +52,7 @@ def load_audio_file():
     if not User.query.filter_by(name=user_name, token=token).first():
         return "Такого пользователя не существует", 400
 
+    # Присваиваем уникальное имя файлу, создаем путь для временного хранилища WAV файла и сохраняем его
     name_audio = uuid.uuid4()
     wav_path = f'./audio_file/file_wav/{name_audio}.wav'
     audio_wav.save(wav_path)
@@ -76,13 +77,14 @@ def download():
     audio_id = request.args.get('id')
     audio = Audio.query.filter_by(user_id=user_id, id=audio_id).first()
 
+    # Проверка на существование файла в БД и запись во временное хранилище для скачивания
     if audio:
         file_path = f'./download/audio_{audio.name_audio}.mp3'
         with open(file_path, 'wb') as file:
             file.write(audio.audio_file)
         result = send_file(file_path, as_attachment=True)
 
-        # Удаление скаченного файла
+        # Удаление скаченного файла из временного хранилища
         os.unlink(file_path)
         return result
     else:

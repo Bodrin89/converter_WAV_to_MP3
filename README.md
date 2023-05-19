@@ -6,23 +6,27 @@
 
 1. Python 3.10
 2. Postgresql 11
-3. Docker
-4. Docker-compose
+3. Flask
+4. lame
+5. Docker
+6. Docker-compose
 
 <span style="text-indent: 1em; display: block; margin-left: 1em;">Проект включает создание пользователя с
 присвоением ему уникального идентификатора и токена, возможность загрузить файл в формате WAV, перекодировать в MP3
 и скачать по ссылке
 
 ---
-<span style="text-indent: 1em; display: block; margin-left: 1em;">Для запуска проекта клонируйте код и выполните
-команду <span>*docker-compose up*<span> после чего выполнится загрузка docker-контейнера и приложением можно
-пользоваться.
+
+<span style="text-indent: 1em; display: block; margin-left: 1em;">Для запуска проекта клонируйте из репозитория
+файлы *docker-compose.yaml* и *.env*, выполните команду <span>*docker-compose up*<span> после чего выполнится 
+загрузка docker-контейнера из DockerHub и приложением можно пользоваться.
+
+---
 
 <span style="text-indent: 1em; display: block; margin-left: 1em;">Для начала необходимо создать пользователя. Для этого
 выполнить POST запрос по адресу <span>*127.0.0.1:8086/create/*<span> в теле запроса передать JSON имя
-пользователя <span>*{"user_name":
-"имя вашего пользователя"}*<span> ответом будет уникальный идентификатор и токен, а пользователь будет сохранен в базе
-данных.
+пользователя <span>*{"user_name": "имя вашего пользователя"}*<span> ответом будет уникальный идентификатор и токен, 
+а пользователь будет сохранен в базе данных.
 
 <span style="text-indent: 1em; display: block; margin-left: 1em;">Для конвертации аудио файла с форматом WAV в MP3
 необходимо выполнить POST запрос по адресу <span>*127.0.0.1:8086/load/*<span>  в теле запроса используя Postman передать

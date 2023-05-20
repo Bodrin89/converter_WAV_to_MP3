@@ -5,7 +5,7 @@ from models import User, Audio, db
 API_PORT = os.environ.get("API_PORT")
 
 
-def convert_file(name, user_token, mp3, wav, name_save_audio):
+def convert_file(name: str, user_token: str, mp3: str, wav: str, name_save_audio: str) -> str:
     """Выносим конвертацию файла в отдельный процесс"""
     # Вызов команды lame для конвертации
     command = f'lame --preset insane "{wav}" "{mp3}"'

@@ -1,10 +1,12 @@
 import os
+
 from concurrent.futures import ProcessPoolExecutor
 
 import uuid
 import secrets
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify, Response
 from dotenv import load_dotenv, find_dotenv
+from werkzeug.datastructures import FileStorage
 
 from config import Config
 from convert_file import convert_file
@@ -15,7 +17,6 @@ app = Flask(__name__)
 load_dotenv(find_dotenv())
 
 
-
 app.config.from_object(Config)
 db.init_app(app)
 
@@ -24,10 +25,10 @@ with app.app_context():
 
 
 @app.route('/create/', methods=['POST'])
-def create_user():
+def create_user() -> Response:
     """Создание пользователя"""
 
-    user_name = request.get_json()
+    user_name: dict = request.get_json()
     user = User(
         uuid=uuid.uuid4(),
         name=user_name.get('user_name'),
@@ -40,20 +41,20 @@ def create_user():
 
 
 @app.route('/load/', methods=['POST'])
-def load_audio_file():
+def load_audio_file() -> jsonify | str:
     """Загрузка wav файла конвертирование его в mp3 """
 
-    user_name = request.form.get('user_name')
-    token = request.form.get('token')
-    audio_wav = request.files.get('audio')
+    user_name: str = request.form.get('user_name')
+    token: str = request.form.get('token')
+    audio_wav: FileStorage = request.files.get('audio')
     if not (user_name and token and audio_wav):
-        return {'message': 'Не корректные данные'}, 400
+        return jsonify({'message': 'Не корректные данные'}), 400
 
     if not User.query.filter_by(name=user_name, token=token).first():
-        return "Такого пользователя не существует", 400
+        return jsonify({'message': 'Такого пользователя не существует'}), 400
 
     # Присваиваем уникальное имя файлу, создаем путь для временного хранилища WAV файла и сохраняем его
-    name_audio = uuid.uuid4()
+    name_audio = str(uuid.uuid4())
     wav_path = f'./audio_file/file_wav/{name_audio}.wav'
     audio_wav.save(wav_path)
 
@@ -65,17 +66,17 @@ def load_audio_file():
 
     # Запускаем конвертацию файла в отдельном процессе
     future = executor.submit(convert_file, user_name, token, mp3_path, wav_path, name_audio)
-    download_url = future.result()
+    download_url: str = future.result()
     return download_url
 
 
 @app.route('/record/')
-def download():
+def download() -> Response | jsonify:
     """Скачивание mp3 файла из БД"""
 
-    user_id = request.args.get('user')
-    audio_id = request.args.get('id')
-    audio = Audio.query.filter_by(user_id=user_id, id=audio_id).first()
+    user_id: str = request.args.get('user')
+    audio_id: str = request.args.get('id')
+    audio: Audio = Audio.query.filter_by(user_id=user_id, id=audio_id).first()
 
     # Проверка на существование файла в БД и запись во временное хранилище для скачивания
     if audio:
@@ -88,7 +89,7 @@ def download():
         os.unlink(file_path)
         return result
     else:
-        return 'Аудио файл не найден', 400
+        return jsonify({'massage': 'Аудио файл не найден'}), 400
 
 
 if __name__ == '__main__':

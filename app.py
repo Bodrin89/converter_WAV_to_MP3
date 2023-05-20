@@ -1,5 +1,5 @@
 import os
-
+from typing import Union
 from concurrent.futures import ProcessPoolExecutor
 
 import uuid
@@ -41,7 +41,7 @@ def create_user() -> Response:
 
 
 @app.route('/load/', methods=['POST'])
-def load_audio_file() -> jsonify | str:
+def load_audio_file() -> Union[jsonify, str]:
     """Загрузка wav файла конвертирование его в mp3 """
 
     user_name: str = request.form.get('user_name')
@@ -71,7 +71,7 @@ def load_audio_file() -> jsonify | str:
 
 
 @app.route('/record/')
-def download() -> Response | jsonify:
+def download() -> Union[Response, jsonify]:
     """Скачивание mp3 файла из БД"""
 
     user_id: str = request.args.get('user')
